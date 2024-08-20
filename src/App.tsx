@@ -5,10 +5,8 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Heading,
-  HStack,
   IconButton,
   Input,
   InputGroup,
@@ -16,7 +14,7 @@ import {
   Textarea,
   VStack,
 } from "@chakra-ui/react";
-import { CopyIcon, CheckIcon, AddIcon } from "@chakra-ui/icons";
+import { CopyIcon, CheckIcon, AddIcon, MinusIcon } from "@chakra-ui/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { produce } from "immer";
 
@@ -138,6 +136,12 @@ function App() {
         <VStack align="stretch">
           {params.map((param, index) => (
             <Flex key={index} gap={2}>
+              <IconButton
+                aria-label="remove parameter"
+                variant="outline"
+                icon={<MinusIcon w={3} h={3} />}
+                onClick={() => removeParam(index)}
+              />
               <Input
                 flex={1}
                 value={param.key}
