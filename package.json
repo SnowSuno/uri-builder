@@ -17,7 +17,9 @@
     "framer-motion": "^11.3.24",
     "immer": "^10.1.1",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.1",
+    "use-query-params": "^2.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",

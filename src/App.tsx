@@ -7,7 +7,9 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
+  HStack,
   IconButton,
+  Image,
   Input,
   InputGroup,
   InputRightElement,
@@ -17,6 +19,7 @@ import {
 import { CopyIcon, CheckIcon, AddIcon, MinusIcon } from "@chakra-ui/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { produce } from "immer";
+import { StringParam, useQueryParam, withDefault } from "use-query-params";
 
 type Param = { key: string; value: string };
 const isNotBlank = (value: string) => value.length > 0;
@@ -38,7 +41,10 @@ const parseUri = (uriString: string) => {
 };
 
 function App() {
-  const [uriString, setUriString] = useState("supertoss://main?referrer=test");
+  const [uriString, setUriString] = useQueryParam(
+    "uri",
+    withDefault(StringParam, "supertoss://main?referrer=test"),
+  );
 
   const [uriBase, setUriBase] = useState(parseUri(uriString)?.base ?? "");
   const [params, setParams] = useState<Param[]>(
@@ -97,9 +103,11 @@ function App() {
 
   return (
     <Container maxW="container.lg" pt={10}>
-      <Heading size="lg" mb={6}>
-        스킴 생성기
-      </Heading>
+      <HStack mb={6} gap={2}>
+        <Image src="/favicon.svg" w={9} h={9} />
+        <Heading size="lg">스킴 생성기</Heading>
+      </HStack>
+
       <FormControl isInvalid={error}>
         <FormLabel>스킴</FormLabel>
         <InputGroup>
