@@ -43,7 +43,7 @@ const parseUri = (uriString: string) => {
 function App() {
   const [uriString, setUriString] = useQueryParam(
     "uri",
-    withDefault(StringParam, "supertoss://main?referrer=test"),
+    withDefault(StringParam, "https://www.google.com/search?q=URI+scheme"),
   );
 
   const [uriBase, setUriBase] = useState(parseUri(uriString)?.base ?? "");
