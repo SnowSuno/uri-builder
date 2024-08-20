@@ -84,20 +84,23 @@ function App() {
     setUriString(
       uriBase + (isNotBlank(searchParams) ? `?${searchParams}` : ""),
     );
-  }, [uriBase, setUriBase, searchParams]);
+  }, [uriBase, setUriBase, searchParams, setUriString]);
 
-  const onChangeUri = useCallback((uriString: string) => {
-    setUriString(uriString);
+  const onChangeUri = useCallback(
+    (uriString: string) => {
+      setUriString(uriString);
 
-    const uri = parseUri(uriString);
+      const uri = parseUri(uriString);
 
-    if (!uri) {
-      return;
-    }
+      if (!uri) {
+        return;
+      }
 
-    setUriBase(uri.base);
-    setParams(uri.params);
-  }, []);
+      setUriBase(uri.base);
+      setParams(uri.params);
+    },
+    [setUriString],
+  );
 
   const error = useMemo(() => parseUri(uriString) === null, [uriString]);
 
@@ -156,7 +159,7 @@ function App() {
                 onChange={(e) => updateParams(index, "key")(e.target.value)}
               />
               <Input
-                flex={2}
+                flex={3}
                 value={param.value}
                 onChange={(e) => updateParams(index, "value")(e.target.value)}
               />
