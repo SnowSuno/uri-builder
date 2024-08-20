@@ -119,6 +119,7 @@ function App() {
             onChange={(e) => {
               onChangeUri(e.target.value);
             }}
+            onFocus={(e) => e.target.select()}
           />
           <InputRightElement>
             <IconButton
@@ -138,7 +139,11 @@ function App() {
 
       <FormControl>
         <FormLabel>기본 스킴</FormLabel>
-        <Input value={uriBase} onChange={(e) => setUriBase(e.target.value)} />
+        <Input
+          value={uriBase}
+          onChange={(e) => setUriBase(e.target.value)}
+          onFocus={(e) => e.target.select()}
+        />
       </FormControl>
 
       <FormControl mt={4}>
@@ -157,11 +162,13 @@ function App() {
                 flex={1}
                 value={param.key}
                 onChange={(e) => updateParams(index, "key")(e.target.value)}
+                onFocus={(e) => e.target.select()}
               />
               <Input
                 flex={3}
                 value={param.value}
                 onChange={(e) => updateParams(index, "value")(e.target.value)}
+                onFocus={(e) => e.target.select()}
               />
             </Flex>
           ))}
