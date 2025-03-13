@@ -1,25 +1,25 @@
 import {
   Button,
   Container,
-  Divider,
+  Field,
+  Fieldset,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Heading,
   HStack,
   IconButton,
   Image,
   Input,
-  InputGroup,
-  InputRightElement,
+  QrCode,
+  Stack,
+  StackSeparator,
   Textarea,
   VStack,
 } from "@chakra-ui/react";
-import { CopyIcon, CheckIcon, AddIcon, MinusIcon } from "@chakra-ui/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { produce } from "immer";
 import { StringParam, useQueryParam, withDefault } from "use-query-params";
+import { Check, Copy, Minus, Plus } from "lucide-react";
+import { toaster } from "./components/ui/toaster";
 
 type Param = { key: string; value: string };
 const isNotBlank = (value: string) => value.length > 0;
@@ -105,84 +105,115 @@ function App() {
   const error = useMemo(() => parseUri(uriString) === null, [uriString]);
 
   return (
-    <Container maxW="container.lg" pt={10}>
+    <Container maxW="container.xl" pt={10}>
       <HStack mb={6} gap={2}>
-        <Image src="/favicon.svg" w={9} h={9} />
-        <Heading size="lg">스킴 생성기</Heading>
+        <Image src="/favicon.svg" w={8} h={8} />
+        <Heading size="xl">스킴 생성기</Heading>
       </HStack>
 
-      <FormControl isInvalid={error}>
-        <FormLabel>스킴</FormLabel>
-        <InputGroup>
-          <Input
-            value={uriString}
-            onChange={(e) => {
-              onChangeUri(e.target.value);
+      <Stack
+        direction={{ base: "column", md: "row" }}
+        gap={6}
+        separator={<StackSeparator />}
+      >
+        <Fieldset.Root flex={5}>
+          <Fieldset.Legend>기본 스킴</Fieldset.Legend>
+
+          <Fieldset.Content>
+            <Field.Root>
+              <Input
+                value={uriBase}
+                onChange={(e) => setUriBase(e.target.value)}
+                onFocus={(e) => e.target.select()}
+              />
+            </Field.Root>
+          </Fieldset.Content>
+
+          <Fieldset.Content>
+            <Field.Root mt={4}>
+              <Field.Label>쿼리 파라미터</Field.Label>
+
+              <VStack alignSelf="stretch" align="stretch">
+                {params.map((param, index) => (
+                  <Flex key={index} gap={2}>
+                    <IconButton
+                      aria-label="remove parameter"
+                      variant="outline"
+                      onClick={() => removeParam(index)}
+                    >
+                      <Minus strokeWidth={1.5} />
+                    </IconButton>
+                    <Input
+                      flex={1}
+                      value={param.key}
+                      onChange={(e) =>
+                        updateParams(index, "key")(e.target.value)
+                      }
+                      onFocus={(e) => e.target.select()}
+                    />
+                    <Input
+                      flex={3}
+                      value={param.value}
+                      onChange={(e) =>
+                        updateParams(index, "value")(e.target.value)
+                      }
+                      onFocus={(e) => e.target.select()}
+                    />
+                  </Flex>
+                ))}
+
+                <Button variant="surface" color="gray.500" onClick={addParam}>
+                  <Plus strokeWidth={1.5} />
+                  파라미터 추가하기
+                </Button>
+              </VStack>
+            </Field.Root>
+          </Fieldset.Content>
+        </Fieldset.Root>
+
+        <Fieldset.Root flex={4}>
+          <Fieldset.Legend>결과 스킴</Fieldset.Legend>
+          <HStack align="start">
+            <QrCode.Root size="lg" value={uriString}>
+              <QrCode.Frame>
+                <QrCode.Pattern />
+              </QrCode.Frame>
+            </QrCode.Root>
+            <Field.Root invalid={error}>
+              <Textarea
+                autoresize
+                value={uriString}
+                onChange={(e) => onChangeUri(e.target.value)}
+                onFocus={(e) => e.target.select()}
+              />
+
+              {error && (
+                <Field.ErrorText>유효하지 않은 스킴이에요</Field.ErrorText>
+              )}
+            </Field.Root>
+          </HStack>
+
+          <Button
+            disabled={error}
+            onClick={() => {
+              navigator.clipboard.writeText(uriString);
+              setCopied(true);
+              toaster.create({
+                type: "success",
+                title: "클립보드에 스킴을 복사했어요",
+              });
             }}
-            onFocus={(e) => e.target.select()}
-          />
-          <InputRightElement>
-            <IconButton
-              aria-label="copy url"
-              icon={copied ? <CheckIcon w={3} h={3} /> : <CopyIcon />}
-              onClick={() => {
-                navigator.clipboard.writeText(uriString);
-                setCopied(true);
-              }}
-            />
-          </InputRightElement>
-        </InputGroup>
-        {error && <FormErrorMessage>유효하지 않은 스킴이에요</FormErrorMessage>}
-      </FormControl>
-
-      <Divider my={10} />
-
-      <FormControl>
-        <FormLabel>기본 스킴</FormLabel>
-        <Input
-          value={uriBase}
-          onChange={(e) => setUriBase(e.target.value)}
-          onFocus={(e) => e.target.select()}
-        />
-      </FormControl>
-
-      <FormControl mt={4}>
-        <FormLabel>파라미터</FormLabel>
-
-        <VStack align="stretch">
-          {params.map((param, index) => (
-            <Flex key={index} gap={2}>
-              <IconButton
-                aria-label="remove parameter"
-                variant="outline"
-                icon={<MinusIcon w={3} h={3} />}
-                onClick={() => removeParam(index)}
-              />
-              <Input
-                flex={1}
-                value={param.key}
-                onChange={(e) => updateParams(index, "key")(e.target.value)}
-                onFocus={(e) => e.target.select()}
-              />
-              <Input
-                flex={3}
-                value={param.value}
-                onChange={(e) => updateParams(index, "value")(e.target.value)}
-                onFocus={(e) => e.target.select()}
-              />
-            </Flex>
-          ))}
-
-          <Button onClick={addParam} leftIcon={<AddIcon w={3} h={3} />}>
-            파라미터 추가하기
+          >
+            {copied ? <Check strokeWidth={1.5} /> : <Copy strokeWidth={1.5} />}
+            복사하기
           </Button>
-        </VStack>
-      </FormControl>
+        </Fieldset.Root>
+      </Stack>
 
-      <FormControl mt={10}>
-        <FormLabel>메모장</FormLabel>
+      <Field.Root mt={10}>
+        <Field.Label>메모장</Field.Label>
         <Textarea rows={8} />
-      </FormControl>
+      </Field.Root>
     </Container>
   );
 }
